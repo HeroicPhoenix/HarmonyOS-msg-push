@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
 
 
 # 暴露端口
-EXPOSE 12080
+EXPOSE 12082
 
 # 启动命令
 CMD ["python", "app.py"]
