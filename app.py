@@ -133,7 +133,7 @@ async def acr_payload(request: Request, secret: Optional[str] = Query(None), use
     region = repo.get("region", "")
 
     # 组装标题与内容
-    title = f"镜像推送: {repo_full}:{tag or 'latest'}"
+    title = f"镜像自动构建完成！: {repo_full}:{tag or 'latest'}"
     msg_lines = [
         f"仓库：{repo_full}" if repo_full else None,
         f"区域：{region}" if region else None,
