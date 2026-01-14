@@ -150,8 +150,8 @@ async def acr_payload(request: Request, secret: Optional[str] = Query(None), use
     res = push_meow(MIAO_NICKNAME, title or DEFAULT_TITLE, msg, jump_url)
     return JSONResponse(content={"ok": True, "meow_result": res, "user_agent": user_agent}, status_code=200)
 
-# 直接 python app.py 运行（开发用）
+# 直接 python main.py 运行（开发用）
 if __name__ == "__main__":
     import uvicorn
     logger.info("Starting uvicorn at 0.0.0.0:12082")
-    uvicorn.run("app:app", host="0.0.0.0", port=12082, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=12082, reload=True)

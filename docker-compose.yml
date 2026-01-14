@@ -1,0 +1,12 @@
+services:
+  path-scanner:
+    image: crpi-v2fmzydhnzmlpzjc.cn-shanghai.personal.cr.aliyuncs.com/machenkai/harmonyos-msg-push:latest
+    container_name: harmonyos-msg-push
+    ports:
+      - "12082:12082"
+    environment:
+      MIAO_NICKNAME: XXXX
+      MIAO_API_BASE: https://api.chuckfang.com
+    volumes:
+      - /volume1/docker/smtp-split-mailer/data:/data
+    restart: always
