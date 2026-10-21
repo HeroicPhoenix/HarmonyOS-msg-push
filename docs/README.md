@@ -34,7 +34,7 @@ app/
     notify.py              GET /notify、POST /notify
     acr.py                 POST /payload_acr
 Dockerfile                 基础镜像、依赖与运行代码打包
-requirements.txt           Python 3.10 容器验证后的完整依赖版本
+requirements.txt           固定的 Python 运行依赖，含间接依赖
 requirements-dev.txt       运行依赖与测试专用 httpx
 .dockerignore              构建上下文排除规则
 docker-compose.yml        镜像引用、启动、端口、环境、健康检查、重启
