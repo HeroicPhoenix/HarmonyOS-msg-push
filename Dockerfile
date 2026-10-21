@@ -1,20 +1,15 @@
-# ✅ 改成从你自己的 ACR 拉基础镜像
-FROM crpi-v2fmzydhnzmlpzjc.cn-shanghai.personal.cr.aliyuncs.com/machenkai/python:3.10-slim
+# 保留原有 ACR 基础镜像；需要时可用 --build-arg BASE_IMAGE=python:3.10-slim 替换。
+ARG BASE_IMAGE=crpi-v2fmzydhnzmlpzjc.cn-shanghai.personal.cr.aliyuncs.com/machenkai/python:3.10-slim
+FROM ${BASE_IMAGE}
 
-# 设置工作目录
 WORKDIR /app
 
-# 拷贝代码到容器
-COPY . /app
-
-# 安装依赖（使用阿里云镜像源加速）
+# 依赖先单独复制，源码变化时可复用依赖安装层。
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt \
-    -i https://mirrors.aliyun.com/pypi/simple/ \
-    && rm -rf /root/.cache/pip
+    -i https://mirrors.aliyun.com/pypi/simple/
 
+COPY main.py ./
+COPY app/ ./app/
 
-# 暴露端口
-EXPOSE 12082
-
-# 启动命令
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "12082"]
+# 此处只构建镜像；应用命令、端口、环境和健康检查由 Compose 指定。

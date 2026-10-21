@@ -15,9 +15,11 @@ ENV/
 
 # 忽略 Python 缓存文件
 __pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
 *.pyd
+**/*.py[cod]
 
 # 忽略测试文件（如果有）
 tests/
@@ -29,6 +31,7 @@ test.py
 # 忽略本地环境文件
 .env
 *.env
+.env.*
 
 # 忽略操作系统临时文件
 .DS_Store
@@ -38,3 +41,8 @@ Thumbs.db
 build/
 dist/
 downloads/
+
+# 镜像仅需要运行时代码和 requirements.txt
+docs/
+*.md
+docker-compose*.yml

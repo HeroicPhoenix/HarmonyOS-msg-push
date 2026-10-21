@@ -1,12 +1,25 @@
 services:
+  # 保留历史服务名，便于现有 Compose 部署原地更新。
   path-scanner:
     image: crpi-v2fmzydhnzmlpzjc.cn-shanghai.personal.cr.aliyuncs.com/machenkai/harmonyos-msg-push:latest
     container_name: harmonyos-msg-push
+    command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "12082"]
     ports:
       - "12082:12082"
     environment:
-      MIAO_NICKNAME: XXXX
-      MIAO_API_BASE: https://api.chuckfang.com
-    volumes:
-      - /volume1/docker/smtp-split-mailer/data:/data
+      # 部署时直接在这里填写 MeoW 昵称及其他配置。
+      MIAO_NICKNAME: "XXXX"
+      MIAO_API_BASE: "https://api.chuckfang.com"
+      DEFAULT_TITLE: "MeoW"
+      WEBHOOK_SECRET: ""
+      DEFAULT_JUMP_URL: ""
+      LOG_LEVEL: "INFO"
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:12082/health', timeout=3).close()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: always
