@@ -2,7 +2,7 @@
 
 更新日期：2026-10-21。
 
-这是一个无状态的 FastAPI 消息转发服务：接收阿里云 ACR Webhook，将仓库、区域、标签、摘要和推送时间格式化后，以 JSON POST 发送至 MeoW。也提供 GET/POST 手动通知及健康检查。
+这是一个无状态的 FastAPI 消息转发服务：接收阿里云 ACR Webhook、Codex notify 的本轮处理完成事件，格式化后以 JSON POST 发送至 MeoW。也提供 GET/POST 手动通知及健康检查。
 
 当前代码不直接调用 HarmonyOS SDK，不拉取镜像、不执行部署，没有数据库、持久化文件、任务队列或自动重试。手机端实际收件依赖 MeoW 服务与账号配置。
 
@@ -29,10 +29,12 @@ app/
   dependencies.py          获取当前应用配置及可选 secret 校验
   meow.py                  requests POST、超时、上游结果封装
   acr.py                   ACR 报文解析及通知格式化，不访问网络
+  codex.py                 Codex 严格请求模型、路径提取、摘录长度常量和通知格式化
   routes/
     health.py              GET /health
     notify.py              GET /notify、POST /notify
     acr.py                 POST /payload_acr
+    codex.py               POST /payload_codex
 Dockerfile                 基础镜像、依赖与运行代码打包
 requirements.txt           固定的 Python 运行依赖，含间接依赖
 requirements-dev.txt       运行依赖与测试专用 httpx
@@ -40,6 +42,7 @@ requirements-dev.txt       运行依赖与测试专用 httpx
 docker-compose.yml        镜像引用、启动、端口、环境、健康检查、重启
 tests/
   test_api.py             mock 外部推送的接口与并发回归
+  test_codex.py           Codex 协议、格式、鉴权、下游失败和并发回归
   compose_smoke.py         实际容器及模拟 MeoW 的 HTTP 转发验证
 ```
 
@@ -47,9 +50,12 @@ tests/
 
 - 手动通知：`main:app → notify 路由 → verify_secret → push_meow → MeoW`。
 - ACR：`main:app → acr 路由 → verify_secret → format_acr_notification → 线程池 push_meow → MeoW`。
+- Codex：`main:app → codex 路由 → verify_secret → CodexEvent JSON 校验 → format_codex_notification → 线程池 push_meow → MeoW`。
 - 健康检查：`health 路由 → 当前应用配置`，不调用 MeoW。
 
 配置在创建应用时读取，并保存在 `app.state.settings`。`create_app(Settings(...))` 可以建立互相隔离的测试应用。同步手动通知路由由 FastAPI 在线程池执行，ACR 异步路由读取请求体后显式将同步推送放入线程池。
+
+Codex 接口同样在异步读取与校验后将同步推送放入线程池，复用服务端 MeoW 账号及默认跳转地址。它仅支持 `agent-turn-complete`，表示“本轮处理完成”，不判断业务任务成功或整个窗口空闲。请求字段、curl 示例与下游响应检查见 [接口说明](接口说明.md#codex-本轮处理完成通知)。本次只实现服务端，电脑上的 notify 发送脚本与配置留待后续接入。
 
 ## 配置
 

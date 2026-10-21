@@ -6,7 +6,7 @@ from typing import Optional
 from fastapi import FastAPI
 
 from app.config import Settings
-from app.routes import acr, health, notify
+from app.routes import acr, codex, health, notify
 
 
 def create_app(settings: Optional[Settings] = None) -> FastAPI:
@@ -20,4 +20,5 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
     app.include_router(health.router)
     app.include_router(notify.router)
     app.include_router(acr.router)
+    app.include_router(codex.router)
     return app
